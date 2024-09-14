@@ -5,6 +5,9 @@
 For more details on the TSP algorithm:
 - [Top-scoring pairs for feature selection](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-375)
 - [Applications to cancer outcome prediction](https://academic.oup.com/bioinformatics/article/21/20/3896/203010)
+- [A Pairwise Feature Selection Method For Gene Data Using Information Gain](https://egrove.olemiss.edu/etd/943/)
+- [A Robust and Efficient Feature Selection Algorithm for Microarray Data](https://onlinelibrary.wiley.com/doi/10.1002/minf.201600099)
+- [The Robust Classification Model Based on Combinatorial Features](https://ieeexplore.ieee.org/document/8126830/)
 
 ## Status: Work in Progress
 
