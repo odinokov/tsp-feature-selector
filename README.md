@@ -6,6 +6,10 @@ For more details on the TSP algorithm:
 - [Top-scoring pairs for feature selection](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-375)
 - [Applications to cancer outcome prediction](https://academic.oup.com/bioinformatics/article/21/20/3896/203010)
 
+## Status: Work in Progress
+
+This implementation is under development and requires validation.
+
 ## Installation
 
 Clone the repository and install with Poetry:
