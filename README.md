@@ -37,14 +37,14 @@ np.random.seed(42)
 gene_expression = np.random.rand(num_genes, num_samples)
 class_labels = np.array([True] * 500 + [False] * 500)
 
-# Adjust data to simulate differences between classes
-gene_expression[:2, class_labels] += 1
-gene_expression[2:4, class_labels] -= 1
-gene_expression[10, class_labels] -= 1
+# Simulate up/down-regulated genes for both classes
+gene_expression[:2, class_labels] *= 2.0  # Upregulated genes for class 1
+gene_expression[2:4, class_labels] *= 0.5  # Downregulated genes for class 1
+gene_expression[10, class_labels] *= 0.5  # Another downregulated gene for class 1
 
-gene_expression[:2, ~class_labels] -= 1
-gene_expression[2:4, ~class_labels] += 1
-gene_expression[10, ~class_labels] += 1
+gene_expression[:2, ~class_labels] *= 0.5  # Downregulated genes for class 0
+gene_expression[2:4, ~class_labels] *= 2.0  # Upregulated genes for class 0
+gene_expression[10, ~class_labels] *= 2.0  # Upregulated genes for class 0
 
 # Select top 10 gene pairs
 selector = TSPFeatureSelector(top_n=10)

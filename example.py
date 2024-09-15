@@ -11,13 +11,14 @@ def main():
     gene_expression = np.random.rand(num_genes, num_samples)
     class_labels = np.array([True] * 500 + [False] * 500)
 
-    gene_expression[:2, class_labels] += 1
-    gene_expression[2:4, class_labels] -= 1
-    gene_expression[10, class_labels] -= 1
+    # Simulate up/down-regulated genes for both classes
+    gene_expression[:2, class_labels] *= 2.0  # Upregulated genes for class 1
+    gene_expression[2:4, class_labels] *= 0.5  # Downregulated genes for class 1
+    gene_expression[10, class_labels] *= 0.5  # Another downregulated gene for class 1
 
-    gene_expression[:2, ~class_labels] -= 1
-    gene_expression[2:4, ~class_labels] += 1
-    gene_expression[10, ~class_labels] += 1
+    gene_expression[:2, ~class_labels] *= 0.5  # Downregulated genes for class 0
+    gene_expression[2:4, ~class_labels] *= 2.0  # Upregulated genes for class 0
+    gene_expression[10, ~class_labels] *= 2.0  # Upregulated genes for class 0
 
     print(
         f"Running test for {num_genes} genes and {num_samples} samples. Please wait..."
