@@ -155,8 +155,7 @@ def compute_rank_score_numba(
         total_diff += rank_matrix[gene_i, sample] - rank_matrix[gene_j, sample]
     return total_diff / num_samples
 
-
-@njit(parallel=True)
+@njit
 def select_top_tsp_numba(
     sorted_delta_scores: np.ndarray,
     sorted_gene_i: np.ndarray,
@@ -166,10 +165,12 @@ def select_top_tsp_numba(
     class2_indices: np.ndarray,
     top_n: int = 1,
 ) -> Tuple[np.ndarray, np.ndarray]:
+
     total_pairs = sorted_delta_scores.size
     selected_gene_i = np.empty(top_n, dtype=np.int32)
     selected_gene_j = np.empty(top_n, dtype=np.int32)
 
+    # Compute rank differences for all gene pairs
     rank_diffs = np.empty(total_pairs, dtype=np.float64)
     for idx in prange(total_pairs):
         gene_i = sorted_gene_i[idx]
@@ -178,38 +179,41 @@ def select_top_tsp_numba(
         gamma_c2 = compute_rank_score_numba(rank_matrix, gene_i, gene_j, class2_indices)
         rank_diffs[idx] = np.abs(gamma_c1 - gamma_c2)
 
-    current_delta = sorted_delta_scores[0]
-    delta_group_indices = []
+    # Identify the start indices of groups with the same delta score
+    group_starts = np.empty(total_pairs, dtype=np.int32)
+    group_count = 0
+    group_starts[0] = 0
+
+    for idx in range(1, total_pairs):
+        if sorted_delta_scores[idx] != sorted_delta_scores[idx - 1]:
+            group_count += 1
+            group_starts[group_count] = idx
+    total_groups = group_count + 1
+
     selected_count = 0
 
-    for idx in range(total_pairs):
-        delta = sorted_delta_scores[idx]
-
-        if delta != current_delta:
-            if len(delta_group_indices) > 1:
-                delta_group_indices = np.array(delta_group_indices)
-                sorted_indices = np.argsort(-rank_diffs[delta_group_indices])
-                for s_idx in sorted_indices:
-                    if selected_count < top_n:
-                        index = delta_group_indices[s_idx]
-                        selected_gene_i[selected_count] = sorted_gene_i[index]
-                        selected_gene_j[selected_count] = sorted_gene_j[index]
-                        selected_count += 1
-                    else:
-                        break
-            else:
-                if selected_count < top_n:
-                    index = delta_group_indices[0]
-                    selected_gene_i[selected_count] = sorted_gene_i[index]
-                    selected_gene_j[selected_count] = sorted_gene_j[index]
-                    selected_count += 1
-                else:
-                    break
-
-            current_delta = delta
-            delta_group_indices = [idx]
+    # Process each group until top_n gene pairs are selected
+    for group_idx in range(total_groups):
+        start_idx = group_starts[group_idx]
+        if group_idx < total_groups - 1:
+            end_idx = group_starts[group_idx + 1]
         else:
-            delta_group_indices.append(idx)
+            end_idx = total_pairs
+
+        group_size = end_idx - start_idx
+        group_rank_diffs = rank_diffs[start_idx:end_idx]
+
+        # Sort indices within the group based on rank differences
+        sorted_indices_within_group = np.argsort(-group_rank_diffs)
+
+        for s in range(group_size):
+            if selected_count < top_n:
+                index = start_idx + sorted_indices_within_group[s]
+                selected_gene_i[selected_count] = sorted_gene_i[index]
+                selected_gene_j[selected_count] = sorted_gene_j[index]
+                selected_count += 1
+            else:
+                break
 
         if selected_count >= top_n:
             break
