@@ -37,6 +37,8 @@ np.random.seed(42)
 gene_expression = np.random.rand(num_genes, num_samples)
 class_labels = np.array([True] * 500 + [False] * 500)
 
+assert np.all(np.isin(class_labels, [True, False])) # Class labels must contain only True and False values
+
 # Simulate up/down-regulated genes for both classes
 gene_expression[:2, class_labels] *= 2.0  # Upregulated genes for class 1
 gene_expression[2:4, class_labels] *= 0.5  # Downregulated genes for class 1
