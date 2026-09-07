@@ -1,5 +1,9 @@
 # tspfs
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Typed](https://img.shields.io/badge/typed-mypy%20strict-blue)](pyproject.toml)
+
 ![tspfs pipeline](docs/images/tspfs.png)
 
 `tspfs` is a scikit-learn compatible implementation of Top-Scoring
@@ -147,8 +151,9 @@ Learned attributes for binary models:
 - `candidate_features_`: feature indices retained for pair scoring. Contains all
   feature indices when screening is disabled.
 
-For multiclass models, binary submodels are stored in `estimators_`, and their
-tasks are stored in `tasks_`.
+Binary submodels are stored in `estimators_`, and their class tasks in
+`tasks_`. Binary fits store a single submodel there; multiclass fits store one
+per one-vs-rest or one-vs-one task.
 
 ### Errors
 
@@ -320,7 +325,8 @@ top_features = np.unique(clf.pairs_.ravel())
 print(top_features)
 ```
 
-With feature names:
+With feature names (here `expression_matrix` is your pandas DataFrame of
+training features):
 
 ```python
 feature_names = np.asarray(expression_matrix.columns)
@@ -432,6 +438,9 @@ the column order is essential.
 
 `skops` is designed for safer scikit-learn model persistence because it avoids
 loading arbitrary pickle payloads by default.
+
+In the snippets below, `feature_names` are your training column names and
+`expression_matrix` is the new-data DataFrame scored at inference.
 
 ```python
 # pip install skops
@@ -546,7 +555,7 @@ For parallel fitting, create one estimator instance per worker, for example with
 
 ## Validation
 
-Check package metadata:
+Check package metadata (requires the `build` package, `pip install build`):
 
 ```bash
 python -m build --sdist
